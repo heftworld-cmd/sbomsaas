@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Flask OAuth App{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto">
+    <!-- Welcome Header -->
+    <div class="bg-white rounded-lg shadow-md p-8 mb-8">
+        <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-4">
+                {% if user.picture %}
+                <img src="{{ user.picture }}" alt="Profile" class="w-16 h-16 rounded-full" onerror="this.style.display='none'">
+                {% else %}
+                <div class="w-16 h-16 rounded-full bg-blue-500 flex items-center justify-center text-white font-bold text-xl">
+                    {{ user.name[0] if user.name else 'U' }}
+                </div>
+                {% endif %}
+                <div>
+                    <h1 class="text-3xl font-bold text-gray-800">Welcome, {{ user.name }}!</h1>
+                    <p class="text-gray-600">{{ user.email }}</p>
+                </div>
+            </div>
+            <div class="text-right">
+                <p class="text-sm text-gray-500">User ID</p>
+                <p class="font-mono text-sm">{{ user.user_id }}</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dashboard Stats -->
+    <div class="grid md:grid-cols-3 gap-6 mb-8">
+        <div class="bg-blue-500 text-white p-6 rounded-lg">
+            <h3 class="text-lg font-semibold mb-2">Session Status</h3>
+            <p class="text-3xl font-bold">Active</p>
+            <p class="text-blue-100 text-sm">JWT Cookie Authentication</p>
+        </div>
+        
+        <div class="bg-green-500 text-white p-6 rounded-lg">
+            <h3 class="text-lg font-semibold mb-2">API Access</h3>
+            <p class="text-3xl font-bold">Enabled</p>
+            <p class="text-green-100 text-sm">Bearer Token Required</p>
+        </div>
+        
+        <div class="bg-purple-500 text-white p-6 rounded-lg">
+            <h3 class="text-lg font-semibold mb-2">Security Level</h3>
+            <p class="text-3xl font-bold">High</p>
+            <p class="text-purple-100 text-sm">OAuth2 + JWT</p>
+        </div>
+    </div>
+
+    <!-- Actions Panel -->
+    <div class="bg-white rounded-lg shadow-md p-8 mb-8">
+        <h2 class="text-2xl font-semibold mb-6">Quick Actions</h2>
+        
+        <div class="grid md:grid-cols-2 gap-4">
+            <button id="loadProfileBtn" class="bg-blue-500 text-white p-4 rounded-lg hover:bg-blue-600 transition duration-200">
+                <h3 class="font-semibold mb-2">Load Profile via API</h3>
+                <p class="text-blue-100 text-sm">Test Bearer token authentication</p>
+            </button>
+            
+            <button id="loadDataBtn" class="bg-green-500 text-white p-4 rounded-lg hover:bg-green-600 transition duration-200">
+                <h3 class="font-semibold mb-2">Load Data via API</h3>
+                <p class="text-green-100 text-sm">Fetch protected data</p>
+            </button>
+            
+            <a href="{{ url_for('get_token') }}" class="bg-purple-500 text-white p-4 rounded-lg hover:bg-purple-600 transition duration-200 block text-center">
+                <h3 class="font-semibold mb-2">Get API Token</h3>
+                <p class="text-purple-100 text-sm">View your JWT token</p>
+            </a>
+            
+            <button id="testProtectedBtn" class="bg-orange-500 text-white p-4 rounded-lg hover:bg-orange-600 transition duration-200">
+                <h3 class="font-semibold mb-2">Test Protected Endpoint</h3>
+                <p class="text-orange-100 text-sm">Call protected API route</p>
+            </button>
+        </div>
+    </div>
+
+    <!-- API Results -->
+    <div id="apiResults" class="bg-white rounded-lg shadow-md p-8 hidden">
+        <h2 class="text-2xl font-semibold mb-4">API Response</h2>
+        <div class="bg-gray-900 text-green-400 p-4 rounded overflow-x-auto">
+            <pre id="apiOutput"></pre>
+        </div>
+        <button id="clearResults" class="mt-4 bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600 transition duration-200">
+            Clear Results
+        </button>
+    </div>
+
+    <!-- Security Information -->
+    <div class="bg-yellow-50 border-l-4 border-yellow-400 p-6 rounded">
+        <h3 class="text-lg font-semibold text-yellow-800 mb-2">Security Note</h3>
+        <p class="text-yellow-700">
+            Your session is secured with JWT tokens. Web pages use HTTP-only cookies for authentication, 
+            while API endpoints require Bearer tokens in the Authorization header. This ensures both 
+            convenience and security for different types of requests.
+        </p>
+    </div>
+</div>
+{% endblock %}
+
+{% block page_scripts %}
+<script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+{% endblock %}
+
+{% block javascript %}
+// Pass auth token to JavaScript
+window.authToken = '{{ auth_token }}';
+{% endblock %}

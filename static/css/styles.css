@@ -1,0 +1,224 @@
+/* Main Styles for Flask OAuth App */
+
+/* Gradient background for hero sections */
+.gradient-bg {
+    background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+}
+
+/* Hover effects */
+.hover-scale {
+    transition: transform 0.2s ease-in-out;
+}
+
+.hover-scale:hover {
+    transform: scale(1.05);
+}
+
+/* Loading animations */
+.loading-spinner {
+    display: inline-block;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Alert styles */
+.alert {
+    border: 1px solid;
+    padding: 1rem;
+    border-radius: 0.375rem;
+    margin-bottom: 1rem;
+    position: relative;
+}
+
+.alert-error {
+    background-color: #FEF2F2;
+    border-color: #F87171;
+    color: #B91C1C;
+}
+
+.alert-success {
+    background-color: #F0FDF4;
+    border-color: #4ADE80;
+    color: #15803D;
+}
+
+.alert-info {
+    background-color: #EFF6FF;
+    border-color: #60A5FA;
+    color: #1D4ED8;
+}
+
+.alert-warning {
+    background-color: #FFFBEB;
+    border-color: #FBBF24;
+    color: #D97706;
+}
+
+.alert .close-btn {
+    position: absolute;
+    top: 0;
+    right: 0;
+    padding: 1rem;
+    cursor: pointer;
+    font-size: 1.5rem;
+}
+
+/* Code block styling */
+.code-block {
+    background-color: #111827;
+    color: #10B981;
+    padding: 1rem;
+    border-radius: 0.375rem;
+    font-family: 'Courier New', monospace;
+    font-size: 0.875rem;
+    overflow-x: auto;
+}
+
+/* API result display */
+.api-results {
+    background-color: white;
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    padding: 2rem;
+}
+
+/* Token display */
+.token-display {
+    background-color: #111827;
+    color: #10B981;
+    padding: 0.75rem;
+    border-radius: 0.375rem;
+    font-family: 'Courier New', monospace;
+    font-size: 0.875rem;
+    word-break: break-all;
+}
+
+/* Security warning box */
+.security-warning {
+    padding: 1rem;
+    background-color: #FFFBEB;
+    border: 1px solid #FDE68A;
+    border-radius: 0.375rem;
+}
+
+/* Endpoint test buttons */
+.endpoint-btn {
+    margin-top: 0.5rem;
+    color: white;
+    padding: 0.25rem 0.75rem;
+    font-size: 0.875rem;
+    border-radius: 0.375rem;
+    transition: background-color 0.2s ease-in-out;
+    border: none;
+    cursor: pointer;
+}
+
+.endpoint-btn:hover {
+    opacity: 0.9;
+}
+
+/* Button variants */
+.btn-blue {
+    background-color: #3B82F6;
+}
+
+.btn-blue:hover {
+    background-color: #2563EB;
+}
+
+.btn-green {
+    background-color: #10B981;
+}
+
+.btn-green:hover {
+    background-color: #059669;
+}
+
+.btn-purple {
+    background-color: #8B5CF6;
+}
+
+.btn-purple:hover {
+    background-color: #7C3AED;
+}
+
+.btn-orange {
+    background-color: #F97316;
+}
+
+.btn-orange:hover {
+    background-color: #EA580C;
+}
+
+.btn-gray {
+    background-color: #6B7280;
+}
+
+.btn-gray:hover {
+    background-color: #4B5563;
+}
+
+/* Copy button styling */
+.copy-btn {
+    background-color: #374151;
+    color: white;
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
+    border-radius: 0.25rem;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.2s ease-in-out;
+}
+
+.copy-btn:hover {
+    background-color: #4B5563;
+}
+
+/* Responsive utilities */
+@media (max-width: 768px) {
+    .hero-section h1 {
+        font-size: 1.875rem;
+    }
+    
+    .dashboard-stats {
+        grid-template-columns: repeat(1, minmax(0, 1fr));
+        gap: 1rem;
+    }
+    
+    .action-buttons {
+        grid-template-columns: repeat(1, minmax(0, 1fr));
+        gap: 1rem;
+    }
+}
+
+/* Utility classes for common patterns */
+.hidden {
+    display: none;
+}
+
+.text-center {
+    text-align: center;
+}
+
+.cursor-pointer {
+    cursor: pointer;
+}
+
+.transition-colors {
+    transition: color 0.2s ease-in-out, background-color 0.2s ease-in-out;
+}
+
+/* Avatar fallback styling */
+.avatar-fallback {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: bold;
+    text-transform: uppercase;
+}

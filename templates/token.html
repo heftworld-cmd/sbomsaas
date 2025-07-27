@@ -1,0 +1,138 @@
+{% extends "base.html" %}
+
+{% block title %}API Token - Flask OAuth App{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto">
+    <!-- Header -->
+    <div class="bg-white rounded-lg shadow-md p-8 mb-8">
+        <h1 class="text-3xl font-bold text-gray-800 mb-4">API Token</h1>
+        <p class="text-gray-600">
+            Use this JWT token to authenticate API requests. Include it in the Authorization header as a Bearer token.
+        </p>
+    </div>
+
+    <!-- Token Display -->
+    <div class="bg-white rounded-lg shadow-md p-8 mb-8">
+        <h2 class="text-xl font-semibold mb-4">Your JWT Token</h2>
+        
+        <div class="bg-gray-100 p-4 rounded border">
+            <div class="flex justify-between items-center mb-2">
+                <span class="text-sm font-medium text-gray-700">Token:</span>
+                <button id="copyTokenBtn" class="bg-blue-500 text-white px-3 py-1 text-sm rounded hover:bg-blue-600 transition duration-200">
+                    Copy
+                </button>
+            </div>
+            <div class="bg-gray-900 text-green-400 p-3 rounded font-mono text-sm break-all">
+                <span id="tokenDisplay">{{ token }}</span>
+            </div>
+        </div>
+        
+        <div class="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded">
+            <h3 class="font-semibold text-yellow-800 mb-2">⚠️ Security Warning</h3>
+            <p class="text-yellow-700 text-sm">
+                Keep this token secure! Do not share it publicly or store it in client-side code. 
+                This token gives access to your account through the API.
+            </p>
+        </div>
+    </div>
+
+    <!-- Usage Examples -->
+    <div class="bg-white rounded-lg shadow-md p-8 mb-8">
+        <h2 class="text-xl font-semibold mb-4">Usage Examples</h2>
+        
+        <div class="space-y-6">
+            <!-- cURL Example -->
+            <div>
+                <h3 class="font-semibold mb-2">cURL</h3>
+                <div class="bg-gray-900 text-green-400 p-4 rounded font-mono text-sm">
+                    <div class="flex justify-between items-start mb-2">
+                        <span class="text-gray-400"># Get user profile</span>
+                        <button class="copy-btn bg-gray-700 text-white px-2 py-1 text-xs rounded hover:bg-gray-600" data-target="curl-example">Copy</button>
+                    </div>
+                    <div id="curl-example">curl -H "Authorization: Bearer {{ token }}" \<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{ request.url_root }}api/profile</div>
+                </div>
+            </div>
+
+            <!-- JavaScript Example -->
+            <div>
+                <h3 class="font-semibold mb-2">JavaScript (Fetch API)</h3>
+                <div class="bg-gray-900 text-green-400 p-4 rounded font-mono text-sm">
+                    <div class="flex justify-between items-start mb-2">
+                        <span class="text-gray-400">// Example API call</span>
+                        <button class="copy-btn bg-gray-700 text-white px-2 py-1 text-xs rounded hover:bg-gray-600" data-target="js-example">Copy</button>
+                    </div>
+                    <div id="js-example">fetch('{{ request.url_root }}api/profile', {<br>&nbsp;&nbsp;method: 'GET',<br>&nbsp;&nbsp;headers: {<br>&nbsp;&nbsp;&nbsp;&nbsp;'Authorization': 'Bearer {{ token }}',<br>&nbsp;&nbsp;&nbsp;&nbsp;'Content-Type': 'application/json'<br>&nbsp;&nbsp;}<br>})<br>.then(response => response.json())<br>.then(data => console.log(data));</div>
+                </div>
+            </div>
+
+            <!-- Python Example -->
+            <div>
+                <h3 class="font-semibold mb-2">Python (Requests)</h3>
+                <div class="bg-gray-900 text-green-400 p-4 rounded font-mono text-sm">
+                    <div class="flex justify-between items-start mb-2">
+                        <span class="text-gray-400"># Python example</span>
+                        <button class="copy-btn bg-gray-700 text-white px-2 py-1 text-xs rounded hover:bg-gray-600" data-target="python-example">Copy</button>
+                    </div>
+                    <div id="python-example">import requests<br><br>headers = {<br>&nbsp;&nbsp;&nbsp;&nbsp;'Authorization': 'Bearer {{ token }}'<br>}<br><br>response = requests.get('{{ request.url_root }}api/profile', headers=headers)<br>data = response.json()<br>print(data)</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- API Endpoints -->
+    <div class="bg-white rounded-lg shadow-md p-8">
+        <h2 class="text-xl font-semibold mb-4">Available API Endpoints</h2>
+        
+        <div class="space-y-4">
+            <div class="border-l-4 border-blue-500 pl-4">
+                <h3 class="font-semibold">GET /api/profile</h3>
+                <p class="text-gray-600 text-sm">Get your user profile information</p>
+                <button class="test-endpoint-btn mt-2 bg-blue-500 text-white px-3 py-1 text-sm rounded hover:bg-blue-600" data-endpoint="/api/profile">
+                    Test Endpoint
+                </button>
+            </div>
+            
+            <div class="border-l-4 border-green-500 pl-4">
+                <h3 class="font-semibold">GET /api/data</h3>
+                <p class="text-gray-600 text-sm">Get sample application data</p>
+                <button class="test-endpoint-btn mt-2 bg-green-500 text-white px-3 py-1 text-sm rounded hover:bg-green-600" data-endpoint="/api/data">
+                    Test Endpoint
+                </button>
+            </div>
+            
+            <div class="border-l-4 border-purple-500 pl-4">
+                <h3 class="font-semibold">GET /api/protected</h3>
+                <p class="text-gray-600 text-sm">Example protected endpoint with timestamp</p>
+                <button class="test-endpoint-btn mt-2 bg-purple-500 text-white px-3 py-1 text-sm rounded hover:bg-purple-600" data-endpoint="/api/protected">
+                    Test Endpoint
+                </button>
+            </div>
+        </div>
+        
+        <!-- Test Results -->
+        <div id="testResults" class="mt-6 hidden">
+            <h3 class="font-semibold mb-2">Test Results</h3>
+            <div class="bg-gray-900 text-green-400 p-4 rounded">
+                <pre id="testOutput"></pre>
+            </div>
+        </div>
+    </div>
+
+    <!-- Back to Dashboard -->
+    <div class="mt-8 text-center">
+        <a href="{{ url_for('dashboard') }}" class="bg-gray-500 text-white px-6 py-3 rounded-lg hover:bg-gray-600 transition duration-200">
+            ← Back to Dashboard
+        </a>
+    </div>
+</div>
+{% endblock %}
+
+{% block page_scripts %}
+<script src="{{ url_for('static', filename='js/token.js') }}"></script>
+{% endblock %}
+
+{% block javascript %}
+// Pass token to JavaScript
+window.pageToken = '{{ token }}';
+{% endblock %}

@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block title %}Error {{ error_code }} - Flask OAuth App{% endblock %}
+
+{% block content %}
+<div class="text-center max-w-md mx-auto">
+    <div class="bg-white p-8 rounded-lg shadow-md">
+        <!-- Error Icon -->
+        <div class="text-6xl mb-4">
+            {% if error_code == 404 %}
+                🔍
+            {% elif error_code == 500 %}
+                ⚠️
+            {% else %}
+                ❌
+            {% endif %}
+        </div>
+        
+        <!-- Error Message -->
+        <h1 class="text-3xl font-bold text-gray-800 mb-4">
+            {% if error_code == 404 %}
+                Page Not Found
+            {% elif error_code == 500 %}
+                Server Error
+            {% else %}
+                Error {{ error_code }}
+            {% endif %}
+        </h1>
+        
+        <p class="text-gray-600 mb-6">
+            {{ error_message }}
+        </p>
+        
+        <!-- Action Buttons -->
+        <div class="space-y-3">
+            <a href="{{ url_for('index') }}" class="block bg-blue-500 text-white px-6 py-3 rounded hover:bg-blue-600 transition duration-200">
+                Go Home
+            </a>
+            
+            <button onclick="history.back()" class="block w-full bg-gray-500 text-white px-6 py-3 rounded hover:bg-gray-600 transition duration-200">
+                Go Back
+            </button>
+        </div>
+    </div>
+</div>
+{% endblock %}

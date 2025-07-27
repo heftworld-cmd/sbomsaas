@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+
+{% block title %}Home - Flask OAuth App{% endblock %}
+
+{% block content %}
+<div class="text-center">
+    <!-- Hero Section -->
+    <div class="gradient-bg text-white py-20 rounded-lg mb-12">
+        <h1 class="text-5xl font-bold mb-6">Welcome to Flask OAuth App</h1>
+        <p class="text-xl mb-8 max-w-2xl mx-auto">
+            A modern web application with Google OAuth2 authentication, JWT tokens, and beautiful Tailwind CSS styling.
+        </p>
+        
+        {% if not user %}
+            <a href="{{ url_for('login') }}" class="bg-white text-blue-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition duration-200 hover-scale">
+                Get Started - Login with Google
+            </a>
+        {% else %}
+            <a href="{{ url_for('dashboard') }}" class="bg-white text-blue-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition duration-200 hover-scale">
+                Go to Dashboard
+            </a>
+        {% endif %}
+    </div>
+
+    <!-- Features Section -->
+    <div class="grid md:grid-cols-3 gap-8 mb-12">
+        <div class="bg-white p-6 rounded-lg shadow-md hover-scale transition duration-200">
+            <div class="text-blue-500 text-4xl mb-4">🔐</div>
+            <h3 class="text-xl font-semibold mb-2">Secure Authentication</h3>
+            <p class="text-gray-600">Google OAuth2 integration with JWT tokens for secure, stateless authentication.</p>
+        </div>
+        
+        <div class="bg-white p-6 rounded-lg shadow-md hover-scale transition duration-200">
+            <div class="text-green-500 text-4xl mb-4">🎨</div>
+            <h3 class="text-xl font-semibold mb-2">Modern Design</h3>
+            <p class="text-gray-600">Beautiful, responsive UI built with Tailwind CSS and enhanced with jQuery.</p>
+        </div>
+        
+        <div class="bg-white p-6 rounded-lg shadow-md hover-scale transition duration-200">
+            <div class="text-purple-500 text-4xl mb-4">⚡</div>
+            <h3 class="text-xl font-semibold mb-2">Fast & Secure</h3>
+            <p class="text-gray-600">JWT-based sessions with separate cookie and API token authentication.</p>
+        </div>
+    </div>
+
+    <!-- Demo Section -->
+    {% if user %}
+    <div class="bg-white p-8 rounded-lg shadow-md mb-8">
+        <h2 class="text-2xl font-semibold mb-4">Welcome back, {{ user.name }}!</h2>
+        <div class="flex justify-center items-center space-x-4 mb-6">
+            {% if user.picture %}
+            <img src="{{ user.picture }}" alt="Profile" class="w-16 h-16 rounded-full" onerror="this.style.display='none'">
+            {% else %}
+            <div class="w-16 h-16 rounded-full bg-blue-500 flex items-center justify-center text-white font-bold text-xl">
+                {{ user.name[0] if user.name else 'U' }}
+            </div>
+            {% endif %}
+            <div class="text-left">
+                <p class="font-semibold">{{ user.name }}</p>
+                <p class="text-gray-600">{{ user.email }}</p>
+            </div>
+        </div>
+        
+        <div class="grid md:grid-cols-2 gap-4">
+            <a href="{{ url_for('dashboard') }}" class="bg-blue-500 text-white px-6 py-3 rounded hover:bg-blue-600 transition duration-200">
+                Access Dashboard
+            </a>
+            <a href="{{ url_for('get_token') }}" class="bg-green-500 text-white px-6 py-3 rounded hover:bg-green-600 transition duration-200">
+                Get API Token
+            </a>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- API Demo Section -->
+    <div class="bg-gray-100 p-8 rounded-lg">
+        <h2 class="text-2xl font-semibold mb-4">API Endpoints</h2>
+        <p class="text-gray-600 mb-6">
+            This application includes protected API endpoints that require Bearer token authentication.
+        </p>
+        
+        <div class="grid md:grid-cols-3 gap-4 text-sm">
+            <div class="bg-white p-4 rounded border-l-4 border-blue-500">
+                <h4 class="font-semibold">GET /api/profile</h4>
+                <p class="text-gray-600">Get user profile data</p>
+            </div>
+            <div class="bg-white p-4 rounded border-l-4 border-green-500">
+                <h4 class="font-semibold">GET /api/protected</h4>
+                <p class="text-gray-600">Example protected endpoint</p>
+            </div>
+            <div class="bg-white p-4 rounded border-l-4 border-purple-500">
+                <h4 class="font-semibold">GET /api/data</h4>
+                <p class="text-gray-600">Get application data</p>
+            </div>
+        </div>
+        
+        {% if user %}
+        <div class="mt-6">
+            <button id="testApiBtn" class="bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600 transition duration-200">
+                Test API (Browser)
+            </button>
+            <div id="apiResult" class="mt-4 hidden">
+                <pre class="bg-gray-800 text-green-400 p-4 rounded text-left overflow-x-auto"></pre>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block page_scripts %}
+{% if user %}
+<script src="{{ url_for('static', filename='js/index.js') }}"></script>
+{% endif %}
+{% endblock %}
+
+{% block javascript %}
+{% if user %}
+// Pass user login status to JavaScript
+window.userLoggedIn = true;
+{% endif %}
+{% endblock %}
