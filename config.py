@@ -22,6 +22,10 @@ class Config:
     GOOGLE_TOKEN_URL = "https://oauth2.googleapis.com/token"
     GOOGLE_USERINFO_URL = "https://www.googleapis.com/oauth2/v2/userinfo"
 
+    # Kong Gateway configuration
+    KONG_ADMIN_URL = os.getenv("KONG_ADMIN_URL", "http://localhost:8001")
+    KONG_GATEWAY_URL = os.getenv("KONG_GATEWAY_URL", "http://localhost:8000")
+
 class DevelopmentConfig(Config):
     """Development configuration"""
     DEBUG = True

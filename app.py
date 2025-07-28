@@ -9,6 +9,7 @@ from urllib.parse import urlencode
 from config import config
 from auth_utils import generate_jwt_token, get_user_from_cookie, login_required_cookie
 from api_routes import api_bp
+from kong_admin_api import KongAdminAPI, KongAdminAPIError
 
 app = Flask(__name__)
 
@@ -18,6 +19,10 @@ app.config.from_object(config[config_name])
 
 # Register API Blueprint
 app.register_blueprint(api_bp)
+
+# Initialize Kong Admin API
+kong_admin_url = app.config.get('KONG_ADMIN_URL', 'http://localhost:8001')
+kong_api = KongAdminAPI(kong_admin_url)
 
 # OAuth Configuration
 oauth = OAuth(app)
@@ -94,6 +99,57 @@ def callback():
         user_response.raise_for_status()
         user_info = user_response.json()
         
+        # Create or ensure Kong consumer exists for this user
+        try:
+            # Create username from email (remove @ and special chars for Kong compatibility)
+            kong_username = user_info['email'].split('@')[0].replace('.', '_').replace('+', '_')
+            
+            # Check if consumer already exists
+            try:
+                existing_consumer, status = kong_api.get_consumer(kong_username)
+                if status == 200:
+                    app.logger.info(f"Kong consumer already exists for user: {user_info['email']}")
+                    kong_consumer_id = existing_consumer['id']
+                else:
+                    # This shouldn't happen if get_consumer worked, but handle it
+                    raise KongAdminAPIError("Unexpected status", status)
+                    
+            except KongAdminAPIError as e:
+                if e.status_code == 404:
+                    # Consumer doesn't exist, create it
+                    app.logger.info(f"Creating Kong consumer for new user: {user_info['email']}")
+                    consumer_response, status = kong_api.create_consumer(
+                        username=kong_username,
+                        custom_id=user_info['email'],  # Use email as unique custom_id
+                        tags=["sbom-saas", "oauth-user", "auto-created"]
+                    )
+                    
+                    if status == 201:
+                        kong_consumer_id = consumer_response['id']
+                        app.logger.info(f"Successfully created Kong consumer {kong_consumer_id} for user: {user_info['email']}")
+                        
+                        # Optionally create an API key for the user
+                        try:
+                            key_response, key_status = kong_api.create_consumer_key(kong_username)
+                            if key_status == 201:
+                                app.logger.info(f"Created API key for user: {user_info['email']}")
+                            else:
+                                app.logger.warning(f"Failed to create API key for user: {user_info['email']} (status: {key_status})")
+                        except KongAdminAPIError as key_error:
+                            app.logger.warning(f"Failed to create API key for user {user_info['email']}: {key_error.message}")
+                    else:
+                        app.logger.error(f"Failed to create Kong consumer for user: {user_info['email']} (status: {status})")
+                        kong_consumer_id = None
+                else:
+                    # Some other error occurred
+                    app.logger.error(f"Kong API error for user {user_info['email']}: {e.message}")
+                    kong_consumer_id = None
+                    
+        except Exception as e:
+            # Don't fail the login if Kong operations fail
+            app.logger.error(f"Unexpected error creating Kong consumer for user {user_info['email']}: {str(e)}")
+            kong_consumer_id = None
+
         # Create JWT token
         user_data = {
             'sub': user_info['id'],

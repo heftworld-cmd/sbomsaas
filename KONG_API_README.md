@@ -175,6 +175,13 @@ logging.getLogger('kong_admin_api').setLevel(logging.DEBUG)
    curl -X POST http://localhost:8001/plugins \
      --data "name=key-auth"
    ```
+3. **Compatible urllib3 version**: The code uses `allowed_methods` (urllib3 >= 1.26.0)
+
+## Compatibility Notes
+
+- **urllib3 compatibility**: Uses `allowed_methods` instead of deprecated `method_whitelist`
+- **Python 3.7+**: Type hints and modern Python features
+- **requests >= 2.28.0**: For session management and retry functionality
 
 ## Production Considerations
 
