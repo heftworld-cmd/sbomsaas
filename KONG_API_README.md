@@ -39,28 +39,32 @@ Integration examples showing:
 
 1. **Create Consumer**
    ```python
-   response, status = kong.create_consumer("johndoe", custom_id="cust_001", tags=["paid"])
+   # New pattern: email as username, sanitized email as custom_id
+   response, status = kong.create_consumer("user@example.com", custom_id="user_example", tags=["paid"])
    ```
 
 2. **Get Consumer**
    ```python
-   response, status = kong.get_consumer("johndoe")
+   # Look up by email (now used as username)
+   response, status = kong.get_consumer("user@example.com")
    ```
 
 3. **Create Consumer Auth-Key**
    ```python
-   response, status = kong.create_consumer_key("johndoe", key="custom-key-123")
+   # Use email (username) for key creation
+   response, status = kong.create_consumer_key("user@example.com", key="custom-key-123")
    ```
 
 4. **Get All Auth-Keys**
    ```python
-   response, status = kong.get_consumer_keys("johndoe")
+   # Use email (username) for key retrieval
+   response, status = kong.get_consumer_keys("user@example.com")
    ```
 
 5. **Optional: Delete Consumer/Key**
    ```python
-   response, status = kong.delete_consumer("johndoe")
-   response, status = kong.delete_consumer_key("johndoe", "key_id")
+   response, status = kong.delete_consumer("user@example.com")
+   response, status = kong.delete_consumer_key("user@example.com", "key_id")
    ```
 
 ### ✅ Technical Requirements
@@ -90,11 +94,12 @@ from kong_admin_api import KongAdminAPI, KongAdminAPIError
 kong = KongAdminAPI("http://localhost:8001")
 
 try:
-    # Create consumer
-    consumer, status = kong.create_consumer("user123", custom_id="user@example.com")
+    # Create consumer with email as username and sanitized email as custom_id
+    sanitized_username = "user_example"  # user@example.com -> user_example
+    consumer, status = kong.create_consumer("user@example.com", custom_id=sanitized_username)
     
-    # Create API key
-    key_response, status = kong.create_consumer_key("user123")
+    # Create API key using email (username)
+    key_response, status = kong.create_consumer_key("user@example.com")
     api_key = key_response['key']
     
     print(f"Created API key: {api_key}")
@@ -107,7 +112,7 @@ except KongAdminAPIError as e:
 ```python
 from kong_integration_example import UserAPIService
 
-# In your OAuth callback
+# In your OAuth callback - updated pattern
 api_service = UserAPIService()
 result = api_service.setup_user_api_access(user_data)
 
@@ -122,7 +127,8 @@ The implementation provides robust error handling:
 
 ```python
 try:
-    response, status = kong.create_consumer("duplicate_user")
+    # Using email as username in new pattern
+    response, status = kong.create_consumer("duplicate@example.com")
 except KongAdminAPIError as e:
     if e.status_code == 409:
         print("Consumer already exists")

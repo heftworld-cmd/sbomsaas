@@ -100,55 +100,7 @@ def callback():
         user_info = user_response.json()
         
         # Create or ensure Kong consumer exists for this user
-        try:
-            # Create username from email (remove @ and special chars for Kong compatibility)
-            kong_username = user_info['email'].split('@')[0].replace('.', '_').replace('+', '_')
-            
-            # Check if consumer already exists
-            try:
-                existing_consumer, status = kong_api.get_consumer(kong_username)
-                if status == 200:
-                    app.logger.info(f"Kong consumer already exists for user: {user_info['email']}")
-                    kong_consumer_id = existing_consumer['id']
-                else:
-                    # This shouldn't happen if get_consumer worked, but handle it
-                    raise KongAdminAPIError("Unexpected status", status)
-                    
-            except KongAdminAPIError as e:
-                if e.status_code == 404:
-                    # Consumer doesn't exist, create it
-                    app.logger.info(f"Creating Kong consumer for new user: {user_info['email']}")
-                    consumer_response, status = kong_api.create_consumer(
-                        username=kong_username,
-                        custom_id=user_info['email'],  # Use email as unique custom_id
-                        tags=["sbom-saas", "oauth-user", "auto-created"]
-                    )
-                    
-                    if status == 201:
-                        kong_consumer_id = consumer_response['id']
-                        app.logger.info(f"Successfully created Kong consumer {kong_consumer_id} for user: {user_info['email']}")
-                        
-                        # Optionally create an API key for the user
-                        try:
-                            key_response, key_status = kong_api.create_consumer_key(kong_username)
-                            if key_status == 201:
-                                app.logger.info(f"Created API key for user: {user_info['email']}")
-                            else:
-                                app.logger.warning(f"Failed to create API key for user: {user_info['email']} (status: {key_status})")
-                        except KongAdminAPIError as key_error:
-                            app.logger.warning(f"Failed to create API key for user {user_info['email']}: {key_error.message}")
-                    else:
-                        app.logger.error(f"Failed to create Kong consumer for user: {user_info['email']} (status: {status})")
-                        kong_consumer_id = None
-                else:
-                    # Some other error occurred
-                    app.logger.error(f"Kong API error for user {user_info['email']}: {e.message}")
-                    kong_consumer_id = None
-                    
-        except Exception as e:
-            # Don't fail the login if Kong operations fail
-            app.logger.error(f"Unexpected error creating Kong consumer for user {user_info['email']}: {str(e)}")
-            kong_consumer_id = None
+        kong_consumer_id = create_or_get_kong_consumer(user_info['email'])
 
         # Create JWT token
         user_data = {
@@ -211,6 +163,68 @@ def not_found(error):
 @app.errorhandler(500)
 def internal_error(error):
     return render_template('error.html', error_code=500, error_message='Internal server error'), 500
+
+def create_or_get_kong_consumer(user_email):
+    """
+    Create or retrieve Kong consumer for a user.
+    
+    Args:
+        user_email (str): User's email address
+        
+    Returns:
+        str or None: Kong consumer ID if successful, None if failed
+    """
+    try:
+        # Create username from email (remove @ and special chars for Kong compatibility)
+        kong_username_sanitized = user_email.split('@')[0].replace('.', '_').replace('+', '_')
+        
+        # Check if consumer already exists (using email as username)
+        try:
+            existing_consumer, status = kong_api.get_consumer(user_email)
+            if status == 200:
+                app.logger.info(f"Kong consumer already exists for user: {user_email}")
+                return existing_consumer['id']
+            else:
+                # This shouldn't happen if get_consumer worked, but handle it
+                raise KongAdminAPIError("Unexpected status", status)
+                
+        except KongAdminAPIError as e:
+            if e.status_code == 404:
+                # Consumer doesn't exist, create it
+                app.logger.info(f"Creating Kong consumer for new user: {user_email}")
+                consumer_response, status = kong_api.create_consumer(
+                    username=user_email,  # Use email as username
+                    custom_id=kong_username_sanitized,  # Use sanitized username as custom_id
+                    tags=["free"]
+                )
+                
+                if status == 201:
+                    kong_consumer_id = consumer_response['id']
+                    app.logger.info(f"Successfully created Kong consumer {kong_consumer_id} for user: {user_email}")
+                    
+                    # Optionally create an API key for the user
+                    try:
+                        key_response, key_status = kong_api.create_consumer_key(user_email)
+                        if key_status == 201:
+                            app.logger.info(f"Created API key for user: {user_email}")
+                        else:
+                            app.logger.warning(f"Failed to create API key for user: {user_email} (status: {key_status})")
+                    except KongAdminAPIError as key_error:
+                        app.logger.warning(f"Failed to create API key for user {user_email}: {key_error.message}")
+                    
+                    return kong_consumer_id
+                else:
+                    app.logger.error(f"Failed to create Kong consumer for user: {user_email} (status: {status})")
+                    return None
+            else:
+                # Some other error occurred
+                app.logger.error(f"Kong API error for user {user_email}: {e.message}")
+                return None
+                
+    except Exception as e:
+        # Don't fail the login if Kong operations fail
+        app.logger.error(f"Unexpected error creating Kong consumer for user {user_email}: {str(e)}")
+        return None
 
 if __name__ == '__main__':
     app.run(debug=app.config['DEBUG'], host='0.0.0.0', port=5000)

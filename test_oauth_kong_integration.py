@@ -36,13 +36,14 @@ def test_kong_user_creation():
         print(f"\n👤 Processing user: {user_info['email']}")
         
         try:
-            # Create username from email (same logic as in app.py)
-            kong_username = user_info['email'].split('@')[0].replace('.', '_').replace('+', '_')
-            print(f"   Kong username: {kong_username}")
+            # Updated logic: email as username, sanitized username as custom_id
+            kong_username_sanitized = user_info['email'].split('@')[0].replace('.', '_').replace('+', '_')
+            print(f"   Kong username (email): {user_info['email']}")
+            print(f"   Kong custom_id (sanitized): {kong_username_sanitized}")
             
-            # Check if consumer already exists
+            # Check if consumer already exists (using email as username)
             try:
-                existing_consumer, status = kong_api.get_consumer(kong_username)
+                existing_consumer, status = kong_api.get_consumer(user_info['email'])
                 if status == 200:
                     print(f"   ✅ Consumer already exists: {existing_consumer['id']}")
                     kong_consumer_id = existing_consumer['id']
@@ -54,8 +55,8 @@ def test_kong_user_creation():
                     # Consumer doesn't exist, create it
                     print(f"   🔄 Creating new Kong consumer...")
                     consumer_response, status = kong_api.create_consumer(
-                        username=kong_username,
-                        custom_id=user_info['email'],  # Use email as unique custom_id
+                        username=user_info['email'],  # Use email as username
+                        custom_id=kong_username_sanitized,  # Use sanitized username as custom_id
                         tags=["sbom-saas", "oauth-user", "auto-created", "test"]
                     )
                     
@@ -63,9 +64,9 @@ def test_kong_user_creation():
                         kong_consumer_id = consumer_response['id']
                         print(f"   ✅ Created Kong consumer: {kong_consumer_id}")
                         
-                        # Create an API key for the user
+                        # Create an API key for the user (using email as username)
                         try:
-                            key_response, key_status = kong_api.create_consumer_key(kong_username)
+                            key_response, key_status = kong_api.create_consumer_key(user_info['email'])
                             if key_status == 201:
                                 api_key = key_response['key']
                                 print(f"   ✅ Created API key: {api_key[:12]}***")
@@ -90,18 +91,18 @@ def test_kong_user_creation():
     
     print(f"\n🧹 Cleanup - Removing test consumers:")
     for user_info in test_users:
-        kong_username = user_info['email'].split('@')[0].replace('.', '_').replace('+', '_')
+        # Use email as username for deletion
         try:
-            delete_response, status = kong_api.delete_consumer(kong_username)
+            delete_response, status = kong_api.delete_consumer(user_info['email'])
             if status == 204:
-                print(f"   ✅ Deleted test consumer: {kong_username}")
+                print(f"   ✅ Deleted test consumer: {user_info['email']}")
             else:
-                print(f"   ⚠️  Failed to delete consumer {kong_username} (status: {status})")
+                print(f"   ⚠️  Failed to delete consumer {user_info['email']} (status: {status})")
         except KongAdminAPIError as e:
             if e.status_code == 404:
-                print(f"   ℹ️  Consumer {kong_username} not found (already deleted)")
+                print(f"   ℹ️  Consumer {user_info['email']} not found (already deleted)")
             else:
-                print(f"   ❌ Error deleting consumer {kong_username}: {e.message}")
+                print(f"   ❌ Error deleting consumer {user_info['email']}: {e.message}")
     
     print(f"\n🎉 Kong OAuth integration test completed!")
 
@@ -109,6 +110,7 @@ def test_username_conversion():
     """Test email to Kong username conversion logic"""
     
     print("\n📧 Testing email to Kong username conversion:")
+    print("   New pattern: email as username, sanitized email as custom_id")
     
     test_emails = [
         'user@example.com',
@@ -119,8 +121,8 @@ def test_username_conversion():
     ]
     
     for email in test_emails:
-        kong_username = email.split('@')[0].replace('.', '_').replace('+', '_')
-        print(f"   {email} → {kong_username}")
+        kong_username_sanitized = email.split('@')[0].replace('.', '_').replace('+', '_')
+        print(f"   {email} → username: {email}, custom_id: {kong_username_sanitized}")
 
 if __name__ == "__main__":
     test_username_conversion()
