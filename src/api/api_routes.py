@@ -1,6 +1,6 @@
 import datetime
 from flask import Blueprint, request, jsonify
-from auth_utils import login_required_api, login_required_cookie
+from auth.auth_utils import login_required_api, login_required_cookie
 
 # Create API Blueprint
 api_bp = Blueprint('api', __name__, url_prefix='/api')

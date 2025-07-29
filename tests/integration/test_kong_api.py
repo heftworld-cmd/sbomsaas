@@ -7,7 +7,7 @@ This demonstrates server-to-server communication with Kong Gateway
 import logging
 import sys
 import time
-from kong_admin_api import KongAdminAPI, KongAdminAPIError, KongServiceManager
+from kong.kong_admin_api import KongAdminAPI, KongAdminAPIError
 
 
 def setup_logging():
@@ -134,73 +134,6 @@ def test_kong_admin_api():
         return False
 
 
-def test_kong_service_manager():
-    """Test the high-level KongServiceManager"""
-    
-    print(f"\n\n🏢 Testing Kong Service Manager...")
-    
-    service_manager = KongServiceManager("http://localhost:8001")
-    
-    test_user_id = f"user_{int(time.time())}"
-    test_username = f"testuser_{int(time.time())}"
-    test_email = f"test{int(time.time())}@example.com"
-    
-    try:
-        # Test provisioning API access
-        print(f"\n1️⃣ Provisioning API access for user:")
-        result = service_manager.provision_user_api_access(
-            user_id=test_user_id,
-            username=test_username,
-            email=test_email
-        )
-        
-        if result['success']:
-            print(f"   ✅ API access provisioned successfully")
-            print(f"   Consumer ID: {result['consumer_id']}")
-            print(f"   API Key: {result['api_key'][:12]}***")
-        else:
-            print(f"   ❌ Failed to provision API access: {result['error']}")
-            return False
-        
-        # Test getting user API keys
-        print(f"\n2️⃣ Getting user API keys:")
-        keys_result = service_manager.get_user_api_keys(test_username)
-        
-        if keys_result['success']:
-            print(f"   ✅ Found {keys_result['count']} API keys")
-            if keys_result['keys']:
-                key_to_revoke = keys_result['keys'][0]['id']
-        else:
-            print(f"   ❌ Failed to get API keys: {keys_result['error']}")
-            return False
-        
-        # Test revoking an API key
-        if 'key_to_revoke' in locals():
-            print(f"\n3️⃣ Revoking API key:")
-            revoke_result = service_manager.revoke_user_api_key(test_username, key_to_revoke)
-            
-            if revoke_result['success']:
-                print(f"   ✅ API key revoked successfully")
-            else:
-                print(f"   ❌ Failed to revoke API key: {revoke_result['error']}")
-        
-        # Cleanup: Remove all user access
-        print(f"\n🧹 Cleanup - Removing all user access:")
-        cleanup_result = service_manager.cleanup_user_access(test_username)
-        
-        if cleanup_result['success']:
-            print(f"   ✅ All user access removed successfully")
-        else:
-            print(f"   ❌ Failed to cleanup user access: {cleanup_result['error']}")
-        
-        print(f"\n🎉 Kong Service Manager tests completed successfully!")
-        return True
-        
-    except Exception as e:
-        print(f"\n❌ Service Manager error: {e}")
-        return False
-
-
 def main():
     """Main test runner"""
     setup_logging()
@@ -212,18 +145,10 @@ def main():
     # Test basic API functionality
     api_success = test_kong_admin_api()
     
-    if api_success:
-        # Test high-level service manager
-        service_success = test_kong_service_manager()
-    else:
-        print("\n⚠️  Skipping Service Manager tests due to API test failures")
-        service_success = False
-    
     print("\n" + "=" * 60)
-    if api_success and service_success:
+    if api_success:
         print("🎉 All tests passed! Kong Admin API is working correctly.")
         print("\n💡 Integration Tips:")
-        print("   - Use KongServiceManager in your Flask app for high-level operations")
         print("   - Use KongAdminAPI directly for fine-grained control")
         print("   - Make sure Kong Gateway is running with key-auth plugin enabled")
         print("   - Check Kong Admin API logs for detailed request/response info")

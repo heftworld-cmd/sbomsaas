@@ -24,9 +24,7 @@ class Config:
 
     # Kong Gateway configuration
     KONG_ADMIN_URL = os.getenv("KONG_ADMIN_URL", "http://localhost:8001")
-
-    # Auto generated not getting used
-    #KONG_GATEWAY_URL = os.getenv("KONG_GATEWAY_URL", "http://localhost:8000")
+    KONG_GATEWAY_URL = os.getenv("KONG_GATEWAY_URL", "http://localhost:8000")
 
 class DevelopmentConfig(Config):
     """Development configuration"""

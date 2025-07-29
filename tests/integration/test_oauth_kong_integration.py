@@ -6,7 +6,7 @@ This simulates the OAuth flow and tests Kong consumer creation
 
 import sys
 import logging
-from kong_admin_api import KongAdminAPI, KongAdminAPIError
+from kong.kong_admin_api import KongAdminAPI, KongAdminAPIError
 
 def test_kong_user_creation():
     """Test creating Kong consumers for OAuth users"""

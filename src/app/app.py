@@ -1,4 +1,5 @@
 import os
+import sys
 import jwt
 import datetime
 from flask import Flask, render_template, request, jsonify, redirect, url_for, make_response, session
@@ -6,12 +7,18 @@ from authlib.integrations.flask_client import OAuth
 import requests
 import secrets
 from urllib.parse import urlencode
-from config import config
-from auth_utils import generate_jwt_token, get_user_from_cookie, login_required_cookie
-from api_routes import api_bp
-from kong_admin_api import KongAdminAPI, KongAdminAPIError
 
-app = Flask(__name__)
+# Add src to Python path for imports
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
+
+from config.config import config
+from auth.auth_utils import generate_jwt_token, get_user_from_cookie, login_required_cookie
+from api.api_routes import api_bp
+from kong.kong_admin_api import KongAdminAPI, KongAdminAPIError
+
+app = Flask(__name__, 
+           template_folder='../templates',
+           static_folder='../static')
 
 # Load configuration
 config_name = os.getenv('FLASK_ENV', 'default')
