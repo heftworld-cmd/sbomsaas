@@ -162,6 +162,13 @@ def get_token(user):
     token = request.cookies.get('auth_token')
     return render_template('token.html', token=token, user=user)
 
+# Pricing page
+@app.route('/pricing')
+def pricing():
+    """Show pricing table page"""
+    user = get_user_from_cookie()
+    return render_template('pricing.html', user=user)
+
 # Error handlers
 @app.errorhandler(404)
 def not_found(error):

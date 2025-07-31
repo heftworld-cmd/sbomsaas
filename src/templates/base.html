@@ -26,6 +26,7 @@
                 </div>
                 
                 <div class="flex items-center space-x-4">
+                    <a href="{{ url_for('pricing') }}" class="text-gray-600 hover:text-blue-600 transition duration-200">Pricing</a>
                     {% if user %}
                         <span class="text-gray-600">Hello, {{ user.name }}!</span>
                         {% if user.picture %}

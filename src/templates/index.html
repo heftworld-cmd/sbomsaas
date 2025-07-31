@@ -12,13 +12,17 @@
         </p>
         
         {% if not user %}
-            <a href="{{ url_for('login') }}" class="bg-white text-blue-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition duration-200 hover-scale">
-                Get Started - Login with Google
-            </a>
+            <div class="space-x-4">
+                <a href="{{ url_for('login') }}" class="bg-white text-blue-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition duration-200 hover-scale">
+                    Get Started - Login with Google
+                </a>
+            </div>
         {% else %}
-            <a href="{{ url_for('dashboard') }}" class="bg-white text-blue-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition duration-200 hover-scale">
-                Go to Dashboard
-            </a>
+            <div class="space-x-4">
+                <a href="{{ url_for('dashboard') }}" class="bg-white text-blue-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition duration-200 hover-scale">
+                    Go to Dashboard
+                </a>
+            </div>
         {% endif %}
     </div>
 

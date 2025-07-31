@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+
+{% block title %}Pricing - Flask OAuth App{% endblock %}
+
+{% block head %}
+
+{% endblock %}
+
+{% block content %}
+<div class="text-center">
+    <!-- Pricing Hero Section -->
+    <div class="gradient-bg text-white py-16 rounded-lg mb-12">
+        <h1 class="text-4xl font-bold mb-4">Choose Your Plan</h1>
+        <p class="text-xl mb-6 max-w-2xl mx-auto">
+            Select the perfect plan for your needs. Start with our free tier or upgrade for advanced features.
+        </p>
+    </div>
+
+    <!-- Pricing Table Section -->
+    <script async src="https://js.stripe.com/v3/pricing-table.js"></script>
+    <div class="mb-12">
+        <stripe-pricing-table 
+            pricing-table-id="prctbl_1RqVJpPUotEIw62HfsB9rFYl"
+            publishable-key="pk_test_51RNUk0PUotEIw62HvS4CsYKeBSgZWyXDIrJwPTTcVoehjRuhBPL5kmCHI5QEkcNmpXYTu52Qo8nE23t1JFYnZyei00iz8MjqCy">
+        </stripe-pricing-table>
+    </div>
+
+    <!-- Features Comparison -->
+    <div class="bg-white p-8 rounded-lg shadow-md mb-12">
+        <h2 class="text-2xl font-semibold mb-6">Why Choose Our Platform?</h2>
+        <div class="grid md:grid-cols-3 gap-8">
+            <div class="text-center">
+                <div class="text-blue-500 text-4xl mb-4">🚀</div>
+                <h3 class="text-lg font-semibold mb-2">Fast & Reliable</h3>
+                <p class="text-gray-600">High-performance infrastructure with 99.9% uptime guarantee.</p>
+            </div>
+            
+            <div class="text-center">
+                <div class="text-green-500 text-4xl mb-4">🔒</div>
+                <h3 class="text-lg font-semibold mb-2">Secure by Design</h3>
+                <p class="text-gray-600">Enterprise-grade security with OAuth2 and JWT authentication.</p>
+            </div>
+            
+            <div class="text-center">
+                <div class="text-purple-500 text-4xl mb-4">📊</div>
+                <h3 class="text-lg font-semibold mb-2">Advanced Analytics</h3>
+                <p class="text-gray-600">Comprehensive reporting and insights to grow your business.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- FAQ Section -->
+    <div class="bg-gray-100 p-8 rounded-lg mb-12">
+        <h2 class="text-2xl font-semibold mb-6">Frequently Asked Questions</h2>
+        <div class="space-y-6 text-left max-w-3xl mx-auto">
+            <div class="bg-white p-6 rounded-lg shadow-sm">
+                <h3 class="font-semibold mb-2">Can I change my plan anytime?</h3>
+                <p class="text-gray-600">Yes, you can upgrade or downgrade your plan at any time. Changes take effect immediately.</p>
+            </div>
+            
+            <div class="bg-white p-6 rounded-lg shadow-sm">
+                <h3 class="font-semibold mb-2">Is there a free trial?</h3>
+                <p class="text-gray-600">Our Free tier gives you access to core features. No credit card required to get started.</p>
+            </div>
+            
+            <div class="bg-white p-6 rounded-lg shadow-sm">
+                <h3 class="font-semibold mb-2">What payment methods do you accept?</h3>
+                <p class="text-gray-600">We accept all major credit cards, PayPal, and bank transfers through Stripe.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Call to Action -->
+    <div class="text-center">
+        <p class="text-gray-600 mb-6">Need help choosing the right plan?</p>
+        <div class="space-x-4">
+            <a href="{{ url_for('index') }}" class="bg-gray-500 text-white px-6 py-3 rounded hover:bg-gray-600 transition duration-200">
+                Back to Home
+            </a>
+            {% if user %}
+            <a href="{{ url_for('dashboard') }}" class="bg-blue-500 text-white px-6 py-3 rounded hover:bg-blue-600 transition duration-200">
+                Go to Dashboard
+            </a>
+            {% else %}
+            <a href="{{ url_for('login') }}" class="bg-green-500 text-white px-6 py-3 rounded hover:bg-green-600 transition duration-200">
+                Get Started
+            </a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block page_scripts %}
+<script>
+// Add any pricing-specific JavaScript here if needed
+console.log('Pricing page loaded');
+</script>
+{% endblock %}
+
+
+
+I want to do stripe no code integration. Create a pricing table for index.html
+using following code .
+
+<script async src="https://js.stripe.com/v3/pricing-table.js"></script>
+<stripe-pricing-table pricing-table-id="prctbl_1RqVJpPUotEIw62HfsB9rFYl" publishable-key="pk_test_51RNUk0PUotEIw62HvS4CsYKeBSgZWyXDIrJwPTTcVoehjRuhBPL5kmCHI5QEkcNmpXYTu52Qo8nE23t1JFYnZyei00iz8MjqCy">
+</stripe-pricing-table>
