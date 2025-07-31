@@ -37,6 +37,11 @@
                         </div>
                         {% endif %}
                         <a href="{{ url_for('dashboard') }}" class="text-blue-600 hover:text-blue-800">Dashboard</a>
+                        <a href="https://billing.stripe.com/p/login/test_3cI5kF3CA0PAdo9eN2cIE00?prefilled_email={{ user.email | urlencode }}" 
+                           target="_blank" 
+                           class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded transition duration-200">
+                            Billing
+                        </a>
                         <a href="{{ url_for('logout') }}" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded transition duration-200">
                             Logout
                         </a>
