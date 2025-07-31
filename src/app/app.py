@@ -172,9 +172,9 @@ def get_token(user):
 
 # Pricing page
 @app.route('/pricing')
-def pricing():
-    """Show pricing table page"""
-    user = get_user_from_cookie()
+@login_required_cookie
+def pricing(user):
+    """Show pricing table page (requires authentication)"""
     return render_template('pricing.html', user=user)
 
 # Error handlers
