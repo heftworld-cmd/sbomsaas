@@ -66,6 +66,12 @@ case "$1" in
         print_success "API tests completed!"
         ;;
     
+    "test-stripe")
+        print_status "Running Stripe webhook tests..."
+        python tests/integration/test_stripe_webhook.py
+        print_success "Stripe webhook tests completed!"
+        ;;
+    
     "lint")
         print_status "Running code linting..."
         flake8 src/ tests/ --max-line-length=100 --ignore=E203,W503
@@ -149,6 +155,7 @@ case "$1" in
         echo "  test-unit      - Run unit tests only"
         echo "  test-integration - Run integration tests only"
         echo "  test-api       - Run API tests only"
+        echo "  test-stripe    - Run Stripe webhook tests"
         echo "  lint           - Run code linting"
         echo "  format         - Format code with black"
         echo "  type-check     - Run type checking"

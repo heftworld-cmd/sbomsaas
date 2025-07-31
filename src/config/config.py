@@ -25,6 +25,11 @@ class Config:
     # Kong Gateway configuration
     KONG_ADMIN_URL = os.getenv("KONG_ADMIN_URL", "http://localhost:8001")
     KONG_GATEWAY_URL = os.getenv("KONG_GATEWAY_URL", "http://localhost:8000")
+    
+    # Stripe configuration
+    STRIPE_SECRET_KEY = os.getenv('STRIPE_SECRET_KEY')
+    STRIPE_PUBLISHABLE_KEY = os.getenv('STRIPE_PUBLISHABLE_KEY')
+    STRIPE_WEBHOOK_SECRET = os.getenv('STRIPE_WEBHOOK_SECRET')
 
 class DevelopmentConfig(Config):
     """Development configuration"""

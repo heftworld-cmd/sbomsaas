@@ -1,47 +1,74 @@
-# SBOMSAAS - Flask OAuth2 Web Application
+# SBOMSAAS - Flask OAuth2 Web Application with Stripe Integration
 
-A modern, production-ready Flask web application featuring Google OAuth2 authentication, JWT tokens, and a beautiful responsive UI. Built with separated CSS/JavaScript architecture for maintainable code and optimal performance.
+A modern, production-ready Flask web application featuring Google OAuth2 authentication, JWT tokens, Stripe payments with secure webhooks, and a beautiful responsive UI. Built with separated CSS/JavaScript architecture for maintainable code and optimal performance.
 
 ## ✨ Features
 
 - **🔐 Google OAuth2 Authentication**: Secure login using Google accounts
 - **🎫 JWT Tokens**: Stateless authentication with separate cookie and Bearer token support
-- **🔄 Dual Authentication Modes**:
+- **� Stripe Integration**: Complete payment processing with pricing tables and secure webhooks
+- **�🔄 Dual Authentication Modes**:
   - Web UI: JWT stored in HTTP-only cookies
   - API: Bearer tokens in Authorization headers
 - **🎨 Modern UI**: Responsive design with Tailwind CSS
 - **⚡ Interactive Frontend**: jQuery for enhanced user experience
 - **🛡️ Protected Routes**: Both web pages and API endpoints
-- **🔒 Security Features**: HTTP-only cookies, CSRF protection, fallback handling
+- **🔒 Security Features**: HTTP-only cookies, CSRF protection, webhook signature verification
 - **📱 Mobile Responsive**: Works seamlessly on all device sizes
 - **🖼️ Smart Profile Pictures**: Automatic fallback avatars when Google profile pictures fail to load
+- **🔗 Kong API Gateway Integration**: Optional Kong integration for advanced API management
+- **📊 Webhook Processing**: Secure handling of Stripe payment events
 
 ## 📁 Project Structure
 
 ```
 sbomsaas/
-├── app.py                     # Main Flask application
-├── config.py                  # Configuration settings
-├── requirements.txt           # Python dependencies
-├── run.sh                     # Application startup script
-├── test_api.py               # API testing utility
-├── .env.example              # Environment variables template
-├── .gitignore               # Git ignore rules
-├── README.md                # Project documentation
-├── static/                  # Static assets
-│   ├── css/
-│   │   └── styles.css       # Custom styles and utilities
-│   └── js/
-│       ├── main.js          # Common JavaScript functionality
-│       ├── dashboard.js     # Dashboard-specific features
-│       ├── index.js         # Home page functionality
-│       └── token.js         # Token page functionality
-└── templates/               # HTML templates
-    ├── base.html            # Base template with navigation
-    ├── index.html           # Landing page
-    ├── dashboard.html       # Protected dashboard
-    ├── token.html           # JWT token display and API testing
-    └── error.html           # Error pages
+├── src/                       # Source code
+│   ├── app/
+│   │   └── app.py            # Main Flask application
+│   ├── api/
+│   │   └── api_routes.py     # API endpoints
+│   ├── auth/
+│   │   └── auth_utils.py     # Authentication utilities
+│   ├── config/
+│   │   └── config.py         # Configuration settings
+│   ├── kong/
+│   │   ├── kong_admin_api.py # Kong API integration
+│   │   └── kong_utils.py     # Kong utilities
+│   ├── stripe_integration/
+│   │   ├── stripe_service.py # Stripe webhook service
+│   │   └── webhook_routes.py # Stripe webhook routes
+│   ├── static/               # Static assets
+│   │   ├── css/
+│   │   │   └── styles.css    # Custom styles and utilities
+│   │   └── js/
+│   │       ├── main.js       # Common JavaScript functionality
+│   │       ├── dashboard.js  # Dashboard-specific features
+│   │       ├── index.js      # Home page functionality
+│   │       └── token.js      # Token page functionality
+│   └── templates/            # HTML templates
+│       ├── base.html         # Base template with navigation
+│       ├── index.html        # Landing page with pricing
+│       ├── pricing.html      # Dedicated pricing page
+│       ├── dashboard.html    # Protected dashboard
+│       ├── token.html        # JWT token display and API testing
+│       └── error.html        # Error pages
+├── tests/                    # Test suite
+│   ├── unit/                 # Unit tests
+│   ├── integration/          # Integration tests
+│   │   └── test_stripe_webhook.py # Stripe webhook tests
+│   └── api/                  # API tests
+├── docs/                     # Documentation
+│   └── STRIPE_WEBHOOK_GUIDE.md # Stripe integration guide
+├── scripts/                  # Development scripts
+│   ├── run.sh               # Application startup script
+│   └── dev.sh               # Development utilities
+├── requirements/            # Dependencies
+│   ├── requirements.txt     # Production dependencies
+│   └── requirements-dev.txt # Development dependencies
+├── test_stripe_webhook.py   # Stripe webhook testing utility
+├── .env.example             # Environment variables template
+└── README.md                # Project documentation
 ```
 
 ## 🏗️ Architecture Highlights
@@ -57,29 +84,36 @@ sbomsaas/
 - `index.js`: Home page functionality for logged-in users
 - `token.js`: Token display and API endpoint testing
 
+### Stripe Integration
+- `stripe_service.py`: Core webhook processing service
+- `webhook_routes.py`: Flask routes for webhook endpoints
+- Secure signature verification for all webhook events
+- Comprehensive event handling for payments and subscriptions
+
 ## 🚀 Quick Start
 
 ### 1. Clone and Setup
 ```bash
 git clone https://github.com/heftworld-cmd/sbomsaas.git
 cd sbomsaas
-pip install -r requirements.txt
+./scripts/dev.sh setup  # Sets up virtual environment and dependencies
 ```
 
 ### 2. Environment Configuration
 ```bash
 cp .env.example .env
-# Edit .env with your Google OAuth credentials
+# Edit .env with your credentials:
+# - Google OAuth2 credentials
+# - Stripe API keys and webhook secret
 ```
 
 ### 3. Run the Application
 ```bash
-# Using the startup script
-chmod +x run.sh
-./run.sh
+# Using the startup script (recommended)
+./scripts/run.sh
 
-# Or directly with Python
-python3 app.py
+# Or using development script
+./scripts/dev.sh run
 ```
 
 Visit `http://localhost:5000` to access the application.
@@ -110,28 +144,68 @@ pip install -r requirements.txt
    cp .env.example .env
    ```
 
-2. Edit `.env` and update with your Google OAuth credentials:
+2. Edit `.env` and update with your credentials:
    ```env
+   # Application Security
    SECRET_KEY=your-super-secret-key-change-this-in-production
    JWT_SECRET_KEY=your-jwt-secret-key-change-this-in-production
+   
+   # Google OAuth2 Settings
    GOOGLE_CLIENT_ID=your-google-client-id-from-console
    GOOGLE_CLIENT_SECRET=your-google-client-secret-from-console
+   
+   # Stripe Settings
+   STRIPE_SECRET_KEY=sk_test_your_stripe_secret_key
+   STRIPE_PUBLISHABLE_KEY=pk_test_your_stripe_publishable_key
+   STRIPE_WEBHOOK_SECRET=whsec_your_webhook_secret
+   
+   # Application Settings
    FLASK_ENV=development
    FLASK_DEBUG=True
    ```
 
-### 4. Run the Application
+### 4. Stripe Setup (Optional)
+
+1. **Create Stripe Account**: Sign up at [Stripe Dashboard](https://dashboard.stripe.com/)
+2. **Configure Pricing Table**: Create your pricing table in Stripe Dashboard
+3. **Set up Webhooks**:
+   - Go to Webhooks section in Stripe Dashboard
+   - Add endpoint: `https://yourdomain.com/stripe/webhook`
+   - Select events: `payment_intent.succeeded`, `customer.subscription.*`, `invoice.payment.*`
+   - Copy webhook secret to your `.env` file
+
+### 5. Run the Application
 
 ```bash
-# Option 1: Using the startup script (recommended)
-chmod +x run.sh
-./run.sh
+# Using the startup script (recommended)
+./scripts/run.sh
 
-# Option 2: Direct Python execution
-python3 app.py
+# Or using development utilities
+./scripts/dev.sh run
 ```
 
 The application will be available at `http://localhost:5000`
+
+## 💳 Stripe Integration Features
+
+### Payment Processing
+- **No-Code Pricing Tables**: Embedded Stripe pricing tables for seamless checkout
+- **Secure Webhooks**: Real-time payment event processing with signature verification
+- **Customer Management**: Automatic linking of Stripe customers to user accounts
+- **Billing Portal**: Direct access to Stripe's customer portal for subscription management
+
+### Supported Events
+- Payment success/failure notifications
+- Subscription creation, updates, and cancellations
+- Invoice payment processing
+- Customer data synchronization
+
+### Webhook Endpoints
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/stripe/webhook` | POST | Main webhook for Stripe events |
+| `/stripe/webhook/test` | GET | Configuration test endpoint |
+| `/stripe/events` | GET | List recent events (dev only) |
 
 ## 🔄 Application Flow
 
@@ -230,9 +304,11 @@ curl -H "Authorization: Bearer YOUR_JWT_TOKEN" \
 ## 🧪 Testing the Application
 
 ### 1. Web Interface Testing
-- Visit `/` to see the landing page
+- Visit `/` to see the landing page with pricing integration
 - Click "Login with Google" to test OAuth flow
 - Access `/dashboard` to see protected content
+- Visit `/pricing` to view Stripe pricing tables
+- Test the "Billing" link in navigation for authenticated users
 - Test API calls directly from the dashboard
 - Visit `/get-token` to view and copy your JWT token
 
@@ -254,13 +330,31 @@ curl -H "Authorization: Bearer $TOKEN" \
      http://localhost:5000/api/protected
 ```
 
-### 3. Using the Test Script
+### 3. Stripe Webhook Testing
+```bash
+# Test webhook configuration
+curl http://localhost:5000/stripe/webhook/test
+
+# Run automated webhook tests
+python tests/integration/test_stripe_webhook.py
+
+# Test with Stripe CLI (after installation)
+stripe listen --forward-to localhost:5000/stripe/webhook
+stripe trigger payment_intent.succeeded
+```
+
+### 4. Using Test Scripts
 ```bash
 # Run the included API test script
 python3 test_api.py YOUR_JWT_TOKEN
-```
 
-## 🔧 Troubleshooting
+# Run the full test suite
+./scripts/dev.sh test
+
+# Run specific test categories
+./scripts/dev.sh test-unit
+./scripts/dev.sh test-integration
+```
 
 ## 🔧 Troubleshooting
 
@@ -274,12 +368,33 @@ python3 test_api.py YOUR_JWT_TOKEN
 | **API 401 Errors** | Invalid Bearer token | Ensure token format: `Authorization: Bearer <token>` |
 | **Profile Picture Not Loading** | Missing picture field | Logout and login again to refresh JWT |
 | **CSS/JS Not Loading** | Static file path issues | Check `url_for('static', filename='...')` paths |
+| **Stripe Webhook 400 Error** | Invalid webhook signature | Verify `STRIPE_WEBHOOK_SECRET` in `.env` |
+| **Pricing Table Not Loading** | Incorrect Stripe keys | Check `STRIPE_PUBLISHABLE_KEY` configuration |
+| **Webhook Events Not Processing** | Wrong endpoint URL | Verify webhook URL in Stripe Dashboard |
+| **Billing Link Not Working** | Missing user email | Ensure user is logged in with valid email |
 
 ### Debug Mode
 ```bash
 # Enable debug mode for detailed error messages
 export FLASK_DEBUG=True
-python3 app.py
+./scripts/run.sh
+
+# Test webhook configuration
+curl http://localhost:5000/stripe/webhook/test
+
+# Check webhook logs
+tail -f logs/app.log  # if logging to file
+```
+
+### Stripe Testing
+```bash
+# Test webhook endpoint
+python test_stripe_webhook.py
+
+# Use Stripe test cards
+# Visa: 4242424242424242
+# Visa (declined): 4000000000000002
+# Mastercard: 5555555555554444
 ```
 
 ## 🚀 Production Deployment
@@ -293,6 +408,11 @@ python3 app.py
 - [ ] Use production WSGI server (Gunicorn, uWSGI)
 - [ ] Set up reverse proxy (Nginx, Apache)
 - [ ] Configure SSL certificates
+- [ ] Use production Stripe keys (replace test keys)
+- [ ] Configure production webhook endpoint with HTTPS
+- [ ] Set up webhook monitoring and alerting
+- [ ] Implement proper logging for payment events
+- [ ] Test webhook delivery in production environment
 
 ## 📄 License
 

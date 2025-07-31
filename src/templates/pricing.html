@@ -21,7 +21,7 @@
     <div class="mb-12">
         <stripe-pricing-table 
             pricing-table-id="prctbl_1RqVJpPUotEIw62HfsB9rFYl"
-            publishable-key="pk_test_51RNUk0PUotEIw62HvS4CsYKeBSgZWyXDIrJwPTTcVoehjRuhBPL5kmCHI5QEkcNmpXYTu52Qo8nE23t1JFYnZyei00iz8MjqCy">
+            publishable-key="{{ config.STRIPE_PUBLISHABLE_KEY }}">
         </stripe-pricing-table>
     </div>
 
@@ -104,5 +104,5 @@ I want to do stripe no code integration. Create a pricing table for index.html
 using following code .
 
 <script async src="https://js.stripe.com/v3/pricing-table.js"></script>
-<stripe-pricing-table pricing-table-id="prctbl_1RqVJpPUotEIw62HfsB9rFYl" publishable-key="pk_test_51RNUk0PUotEIw62HvS4CsYKeBSgZWyXDIrJwPTTcVoehjRuhBPL5kmCHI5QEkcNmpXYTu52Qo8nE23t1JFYnZyei00iz8MjqCy">
+<stripe-pricing-table pricing-table-id="prctbl_your_pricing_table_id_here" publishable-key="pk_test_your_stripe_publishable_key_here">
 </stripe-pricing-table>

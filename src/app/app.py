@@ -27,6 +27,14 @@ app.config.from_object(config[config_name])
 # Register API Blueprint
 app.register_blueprint(api_bp)
 
+# Register Stripe Blueprint
+from stripe_integration.webhook_routes import stripe_bp
+app.register_blueprint(stripe_bp)
+
+# Initialize Stripe service
+from stripe_integration.stripe_service import stripe_service
+stripe_service.init_app(app)
+
 # Initialize Kong Admin API
 kong_admin_url = app.config.get('KONG_ADMIN_URL', 'http://localhost:8001')
 kong_api = KongAdminAPI(kong_admin_url)
